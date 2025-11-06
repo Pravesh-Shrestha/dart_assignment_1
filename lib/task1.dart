@@ -1,6 +1,5 @@
 // =============================
 // BANKING SYSTEM IN DART
-// Final Submission Version
 // =============================
 
 abstract class InterestBearing {
