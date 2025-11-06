@@ -1,9 +1,8 @@
 // =============================
 // BANKING SYSTEM IN DART
-// Clean & Simple Version
+// Complete Challenge Version
 // =============================
 
-// -------- INTERFACE -----------
 abstract class InterestBearing {
   double calculateInterest();
 }
@@ -13,6 +12,7 @@ abstract class BankAccount {
   final int accountNumber;
   final String accountHolder;
   double _balance;
+  final List<String> transactions = [];
 
   BankAccount({
     required this.accountNumber,
@@ -27,6 +27,17 @@ abstract class BankAccount {
   // Abstract methods (Abstraction)
   void deposit(double amount);
   void withdraw(double amount);
+
+  void addTransaction(String detail) {
+    transactions.add(detail);
+  }
+
+  void showTransactions() {
+    print('\nTransaction History for $accountHolder:');
+    for (final t in transactions) {
+      print('- $t');
+    }
+  }
 
   void displayInfo() {
     print('===========================');
@@ -51,6 +62,7 @@ class SavingsAccount extends BankAccount implements InterestBearing {
   @override
   void deposit(double amount) {
     _balance += amount;
+    addTransaction('Deposited: \$$amount');
     print('Deposited: \$$amount | New Balance: \$$_balance');
   }
 
@@ -66,6 +78,7 @@ class SavingsAccount extends BankAccount implements InterestBearing {
     }
     _balance -= amount;
     withdrawalCount++;
+    addTransaction('Withdrew: \$$amount');
     print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
   }
 
@@ -93,6 +106,7 @@ class CheckingAccount extends BankAccount {
   @override
   void deposit(double amount) {
     _balance += amount;
+    addTransaction('Deposited: \$$amount');
     print('Deposited: \$$amount | New Balance: \$$_balance');
   }
 
@@ -101,8 +115,10 @@ class CheckingAccount extends BankAccount {
     _balance -= amount;
     if (_balance < 0) {
       _balance -= overdraftFee;
+      addTransaction('Overdraft fee: \$$overdraftFee');
       print('Overdraft! Fee of \$$overdraftFee applied.');
     }
+    addTransaction('Withdrew: \$$amount');
     print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
   }
 
@@ -127,6 +143,7 @@ class PremiumAccount extends BankAccount implements InterestBearing {
   @override
   void deposit(double amount) {
     _balance += amount;
+    addTransaction('Deposited: \$$amount');
     print('Deposited: \$$amount | New Balance: \$$_balance');
   }
 
@@ -137,6 +154,7 @@ class PremiumAccount extends BankAccount implements InterestBearing {
       return;
     }
     _balance -= amount;
+    addTransaction('Withdrew: \$$amount');
     print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
   }
 
@@ -151,13 +169,52 @@ class PremiumAccount extends BankAccount implements InterestBearing {
   }
 }
 
+// -------- STUDENT ACCOUNT -----------
+class StudentAccount extends BankAccount {
+  static const double maxBalance = 5000;
+
+  StudentAccount({
+    required super.accountNumber,
+    required super.accountHolder,
+    required super.balance,
+  });
+
+  @override
+  void deposit(double amount) {
+    if (_balance + amount > maxBalance) {
+      print('Cannot deposit. Max balance of \$$maxBalance reached.');
+      return;
+    }
+    _balance += amount;
+    addTransaction('Deposited: \$$amount');
+    print('Deposited: \$$amount | New Balance: \$$_balance');
+  }
+
+  @override
+  void withdraw(double amount) {
+    if (amount > _balance) {
+      print('Insufficient funds.');
+      return;
+    }
+    _balance -= amount;
+    addTransaction('Withdrew: \$$amount');
+    print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
+  }
+
+  @override
+  void displayInfo() {
+    super.displayInfo();
+    print('Account Type: Student');
+  }
+}
+
 // -------- BANK CLASS -----------
 class Bank {
   final List<BankAccount> accounts = [];
 
   void createAccount(BankAccount account) {
     accounts.add(account);
-    print('Account created for ${account.accountHolder}');
+    print('✅ Account created for ${account.accountHolder}');
   }
 
   BankAccount? findAccount(int accNo) {
@@ -178,9 +235,23 @@ class Bank {
 
     from.withdraw(amount);
     to.deposit(amount);
+    from.addTransaction('Transferred \$$amount to ${to.accountHolder}');
+    to.addTransaction('Received \$$amount from ${from.accountHolder}');
     print(
       'Transferred \$$amount from ${from.accountHolder} to ${to.accountHolder}',
     );
+  }
+
+  // Apply interest to all interest-bearing accounts
+  void applyMonthlyInterest() {
+    print('\nApplying monthly interest...');
+    for (final acc in accounts) {
+      if (acc is InterestBearing) {
+        final interest = (acc as InterestBearing).calculateInterest();
+        acc.deposit(interest);
+        acc.addTransaction('Interest added: \$$interest');
+      }
+    }
   }
 
   void generateReport() {
@@ -201,33 +272,37 @@ void main() {
     accountHolder: 'Alice',
     balance: 1000,
   );
-
   final checking = CheckingAccount(
     accountNumber: 1002,
     accountHolder: 'Bob',
     balance: 200,
   );
-
   final premium = PremiumAccount(
     accountNumber: 1003,
     accountHolder: 'Charlie',
     balance: 15000,
   );
+  final student = StudentAccount(
+    accountNumber: 1004,
+    accountHolder: 'David',
+    balance: 3000,
+  );
 
   bank.createAccount(savings);
   bank.createAccount(checking);
   bank.createAccount(premium);
+  bank.createAccount(student);
 
   savings.withdraw(200);
-  savings.withdraw(200);
-  savings.withdraw(200);
-  savings.withdraw(100);
-
   checking.withdraw(300);
-
   premium.withdraw(6000);
-  premium.deposit(2000);
+  student.deposit(2500);
+  student.withdraw(1000);
 
   bank.transfer(1003, 1001, 500);
+  bank.applyMonthlyInterest();
   bank.generateReport();
+
+  savings.showTransactions();
+  student.showTransactions();
 }
