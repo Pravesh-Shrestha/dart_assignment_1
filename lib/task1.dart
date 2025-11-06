@@ -1,6 +1,6 @@
 // =============================
 // BANKING SYSTEM IN DART
-// Complete Challenge Version
+// Final Submission Version
 // =============================
 
 abstract class InterestBearing {
@@ -34,6 +34,10 @@ abstract class BankAccount {
 
   void showTransactions() {
     print('\nTransaction History for $accountHolder:');
+    if (transactions.isEmpty) {
+      print('No transactions yet.');
+      return;
+    }
     for (final t in transactions) {
       print('- $t');
     }
@@ -43,7 +47,7 @@ abstract class BankAccount {
     print('===========================');
     print('Account Number: $accountNumber');
     print('Account Holder: $accountHolder');
-    print('Balance: $_balance');
+    print('Balance: \$${_balance.toStringAsFixed(2)}');
   }
 }
 
@@ -61,9 +65,15 @@ class SavingsAccount extends BankAccount implements InterestBearing {
 
   @override
   void deposit(double amount) {
+    if (amount <= 0) {
+      print('Deposit amount must be positive.');
+      return;
+    }
     _balance += amount;
     addTransaction('Deposited: \$$amount');
-    print('Deposited: \$$amount | New Balance: \$$_balance');
+    print(
+      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -79,7 +89,9 @@ class SavingsAccount extends BankAccount implements InterestBearing {
     _balance -= amount;
     withdrawalCount++;
     addTransaction('Withdrew: \$$amount');
-    print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
+    print(
+      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -89,7 +101,7 @@ class SavingsAccount extends BankAccount implements InterestBearing {
   void displayInfo() {
     super.displayInfo();
     print('Account Type: Savings');
-    print('Interest (2%): \$${calculateInterest()}');
+    print('Interest (2%): \$${calculateInterest().toStringAsFixed(2)}');
   }
 }
 
@@ -105,9 +117,15 @@ class CheckingAccount extends BankAccount {
 
   @override
   void deposit(double amount) {
+    if (amount <= 0) {
+      print('Deposit amount must be positive.');
+      return;
+    }
     _balance += amount;
     addTransaction('Deposited: \$$amount');
-    print('Deposited: \$$amount | New Balance: \$$_balance');
+    print(
+      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -119,7 +137,9 @@ class CheckingAccount extends BankAccount {
       print('Overdraft! Fee of \$$overdraftFee applied.');
     }
     addTransaction('Withdrew: \$$amount');
-    print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
+    print(
+      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -144,7 +164,9 @@ class PremiumAccount extends BankAccount implements InterestBearing {
   void deposit(double amount) {
     _balance += amount;
     addTransaction('Deposited: \$$amount');
-    print('Deposited: \$$amount | New Balance: \$$_balance');
+    print(
+      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -155,7 +177,9 @@ class PremiumAccount extends BankAccount implements InterestBearing {
     }
     _balance -= amount;
     addTransaction('Withdrew: \$$amount');
-    print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
+    print(
+      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -165,7 +189,7 @@ class PremiumAccount extends BankAccount implements InterestBearing {
   void displayInfo() {
     super.displayInfo();
     print('Account Type: Premium');
-    print('Interest (5%): \$${calculateInterest()}');
+    print('Interest (5%): \$${calculateInterest().toStringAsFixed(2)}');
   }
 }
 
@@ -187,7 +211,9 @@ class StudentAccount extends BankAccount {
     }
     _balance += amount;
     addTransaction('Deposited: \$$amount');
-    print('Deposited: \$$amount | New Balance: \$$_balance');
+    print(
+      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -198,7 +224,9 @@ class StudentAccount extends BankAccount {
     }
     _balance -= amount;
     addTransaction('Withdrew: \$$amount');
-    print('Withdrawn: \$$amount | Remaining Balance: \$$_balance');
+    print(
+      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+    );
   }
 
   @override
@@ -213,8 +241,12 @@ class Bank {
   final List<BankAccount> accounts = [];
 
   void createAccount(BankAccount account) {
+    if (accounts.any((a) => a.accountNumber == account.accountNumber)) {
+      print('Error: Account number ${account.accountNumber} already exists.');
+      return;
+    }
     accounts.add(account);
-    print('✅ Account created for ${account.accountHolder}');
+    print('** Account created for ${account.accountHolder}');
   }
 
   BankAccount? findAccount(int accNo) {
@@ -242,7 +274,6 @@ class Bank {
     );
   }
 
-  // Apply interest to all interest-bearing accounts
   void applyMonthlyInterest() {
     print('\nApplying monthly interest...');
     for (final acc in accounts) {
@@ -269,22 +300,22 @@ void main() {
 
   final savings = SavingsAccount(
     accountNumber: 1001,
-    accountHolder: 'Alice',
+    accountHolder: 'Ankit',
     balance: 1000,
   );
   final checking = CheckingAccount(
     accountNumber: 1002,
-    accountHolder: 'Bob',
+    accountHolder: 'Sujal',
     balance: 200,
   );
   final premium = PremiumAccount(
     accountNumber: 1003,
-    accountHolder: 'Charlie',
+    accountHolder: 'Aayush',
     balance: 15000,
   );
   final student = StudentAccount(
     accountNumber: 1004,
-    accountHolder: 'David',
+    accountHolder: 'Nipuana',
     balance: 3000,
   );
 
