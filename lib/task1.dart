@@ -8,51 +8,56 @@ abstract class InterestBearing {
 
 // -------- BASE ABSTRACT CLASS -----------
 abstract class BankAccount {
-  final int accountNumber;
-  final String accountHolder;
+  final int _accountNumber;
+  final String _accountHolder;
   double _balance;
-  final List<String> transactions = [];
+  final List<String> _transactions = [];
 
   BankAccount({
-    required this.accountNumber,
-    required this.accountHolder,
+    required int accountNumber,
+    required String accountHolder,
     required double balance,
-  }) : _balance = balance;
+  }) : _accountNumber = accountNumber,
+       _accountHolder = accountHolder,
+       _balance = balance;
 
-  // Getter & Setter (Encapsulation)
+  // -------- Encapsulation (Getters & Setters) --------
+  int get accountNumber => _accountNumber;
+  String get accountHolder => _accountHolder;
   double get balance => _balance;
   set balance(double value) => _balance = value;
 
-  // Abstract methods (Abstraction)
+  // -------- Abstract Methods (Abstraction) --------
   void deposit(double amount);
   void withdraw(double amount);
 
+  // -------- Common Utility Methods --------
   void addTransaction(String detail) {
-    transactions.add(detail);
+    _transactions.add(detail);
   }
 
   void showTransactions() {
-    print('\nTransaction History for $accountHolder:');
-    if (transactions.isEmpty) {
+    print('\nTransaction History for $_accountHolder:');
+    if (_transactions.isEmpty) {
       print('No transactions yet.');
       return;
     }
-    for (final t in transactions) {
+    for (final t in _transactions) {
       print('- $t');
     }
   }
 
   void displayInfo() {
     print('===========================');
-    print('Account Number: $accountNumber');
-    print('Account Holder: $accountHolder');
+    print('Account Number: $_accountNumber');
+    print('Account Holder: $_accountHolder');
     print('Balance: \$${_balance.toStringAsFixed(2)}');
   }
 }
 
 // -------- SAVINGS ACCOUNT -----------
 class SavingsAccount extends BankAccount implements InterestBearing {
-  int withdrawalCount = 0;
+  int _withdrawalCount = 0;
   static const double minBalance = 500;
   static const double interestRate = 0.02;
 
@@ -68,33 +73,33 @@ class SavingsAccount extends BankAccount implements InterestBearing {
       print('Deposit amount must be positive.');
       return;
     }
-    _balance += amount;
+    balance += amount;
     addTransaction('Deposited: \$$amount');
     print(
-      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+      'Deposited: \$$amount | New Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
   void withdraw(double amount) {
-    if (withdrawalCount >= 3) {
+    if (_withdrawalCount >= 3) {
       print('Withdrawal limit reached (3 per month).');
       return;
     }
-    if (_balance - amount < minBalance) {
+    if (balance - amount < minBalance) {
       print('Cannot withdraw. Minimum balance of \$$minBalance required.');
       return;
     }
-    _balance -= amount;
-    withdrawalCount++;
+    balance -= amount;
+    _withdrawalCount++;
     addTransaction('Withdrew: \$$amount');
     print(
-      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+      'Withdrew: \$$amount | Remaining Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
-  double calculateInterest() => _balance * interestRate;
+  double calculateInterest() => balance * interestRate;
 
   @override
   void displayInfo() {
@@ -120,24 +125,24 @@ class CheckingAccount extends BankAccount {
       print('Deposit amount must be positive.');
       return;
     }
-    _balance += amount;
+    balance += amount;
     addTransaction('Deposited: \$$amount');
     print(
-      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+      'Deposited: \$$amount | New Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
   void withdraw(double amount) {
-    _balance -= amount;
-    if (_balance < 0) {
-      _balance -= overdraftFee;
+    balance -= amount;
+    if (balance < 0) {
+      balance -= overdraftFee;
       addTransaction('Overdraft fee: \$$overdraftFee');
       print('Overdraft! Fee of \$$overdraftFee applied.');
     }
     addTransaction('Withdrew: \$$amount');
     print(
-      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+      'Withdrew: \$$amount | Remaining Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
@@ -161,28 +166,28 @@ class PremiumAccount extends BankAccount implements InterestBearing {
 
   @override
   void deposit(double amount) {
-    _balance += amount;
+    balance += amount;
     addTransaction('Deposited: \$$amount');
     print(
-      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+      'Deposited: \$$amount | New Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
   void withdraw(double amount) {
-    if (_balance - amount < minBalance) {
+    if (balance - amount < minBalance) {
       print('Cannot withdraw. Must maintain \$$minBalance minimum.');
       return;
     }
-    _balance -= amount;
+    balance -= amount;
     addTransaction('Withdrew: \$$amount');
     print(
-      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+      'Withdrew: \$$amount | Remaining Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
-  double calculateInterest() => _balance * interestRate;
+  double calculateInterest() => balance * interestRate;
 
   @override
   void displayInfo() {
@@ -204,27 +209,27 @@ class StudentAccount extends BankAccount {
 
   @override
   void deposit(double amount) {
-    if (_balance + amount > maxBalance) {
+    if (balance + amount > maxBalance) {
       print('Cannot deposit. Max balance of \$$maxBalance reached.');
       return;
     }
-    _balance += amount;
+    balance += amount;
     addTransaction('Deposited: \$$amount');
     print(
-      'Deposited: \$$amount | New Balance: \$${_balance.toStringAsFixed(2)}',
+      'Deposited: \$$amount | New Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
   @override
   void withdraw(double amount) {
-    if (amount > _balance) {
+    if (amount > balance) {
       print('Insufficient funds.');
       return;
     }
-    _balance -= amount;
+    balance -= amount;
     addTransaction('Withdrew: \$$amount');
     print(
-      'Withdrew: \$$amount | Remaining Balance: \$${_balance.toStringAsFixed(2)}',
+      'Withdrew: \$$amount | Remaining Balance: \$${balance.toStringAsFixed(2)}',
     );
   }
 
@@ -237,19 +242,19 @@ class StudentAccount extends BankAccount {
 
 // -------- BANK CLASS -----------
 class Bank {
-  final List<BankAccount> accounts = [];
+  final List<BankAccount> _accounts = [];
 
   void createAccount(BankAccount account) {
-    if (accounts.any((a) => a.accountNumber == account.accountNumber)) {
+    if (_accounts.any((a) => a.accountNumber == account.accountNumber)) {
       print('Error: Account number ${account.accountNumber} already exists.');
       return;
     }
-    accounts.add(account);
+    _accounts.add(account);
     print('** Account created for ${account.accountHolder}');
   }
 
   BankAccount? findAccount(int accNo) {
-    for (final a in accounts) {
+    for (final a in _accounts) {
       if (a.accountNumber == accNo) return a;
     }
     return null;
@@ -275,7 +280,7 @@ class Bank {
 
   void applyMonthlyInterest() {
     print('\nApplying monthly interest...');
-    for (final acc in accounts) {
+    for (final acc in _accounts) {
       if (acc is InterestBearing) {
         final interest = (acc as InterestBearing).calculateInterest();
         acc.deposit(interest);
@@ -286,7 +291,7 @@ class Bank {
 
   void generateReport() {
     print('\n======= BANK REPORT =======');
-    for (final acc in accounts) {
+    for (final acc in _accounts) {
       acc.displayInfo();
     }
     print('===========================\n');
@@ -302,16 +307,19 @@ void main() {
     accountHolder: 'Ankit',
     balance: 1000,
   );
+
   final checking = CheckingAccount(
     accountNumber: 1002,
     accountHolder: 'Sujal',
     balance: 200,
   );
+
   final premium = PremiumAccount(
     accountNumber: 1003,
     accountHolder: 'Aayush',
     balance: 15000,
   );
+
   final student = StudentAccount(
     accountNumber: 1004,
     accountHolder: 'Nipuana',
